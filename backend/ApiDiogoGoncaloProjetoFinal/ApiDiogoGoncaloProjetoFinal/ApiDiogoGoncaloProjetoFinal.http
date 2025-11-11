@@ -1,0 +1,6 @@
+@ApiDiogoGoncaloProjetoFinal_HostAddress = http://localhost:5231
+
+GET {{ApiDiogoGoncaloProjetoFinal_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
