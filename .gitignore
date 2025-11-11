@@ -1,0 +1,55 @@
+# Ficheiro gerado por https://www.toptal.com/developers/gitignore/api/dotnetcore,visualstudio,visualstudiocode
+# Este é um ficheiro .gitignore standard para projetos .NET
+
+## IGNORAR PASTA DE CONFIGURAÇÃO DO VISUAL STUDIO ##
+.vs/
+
+## IGNORAR FICHEIROS DE COMPILAÇÃO (O MAIS IMPORTANTE) ##
+[Bb]in/
+[Bb]obj/
+
+## IGNORAR FICHEIROS DE DEBUG E DE UTILIZADOR ##
+*.user
+*.suo
+*.sln.docstates
+*.userosscache
+*.csproj.user
+
+## IGNORAR FICHEIROS DO VISUAL STUDIO CODE ##
+.vscode/
+
+## IGNORAR FICHEIROS DE SISTEMA OPERATIVO ##
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+# Windows
+Thumbs.db
+ehthumbs.db
+
+## IGNORAR FICHEIROS DE LOG E DE TESTE ##
+*.log
+*.trx
+*.testreport
+.sonarqube/
+
+## IGNORAR PACOTES NuGet ##
+# (Embora o .NET moderno use <PackageReference> e isto seja menos necessário,
+#  ainda é boa prática caso se use 'packages.config' antigo ou 'dotnet tool')
+*.nupkg
+*.snupkg
+packages/
+
+## IGNORAR SEGREDOS (MUITO IMPORTANTE) ##
+# Ignora segredos gerados pelo "User Secrets"
+secrets.json
+*.secrets.json
+
+# CONSIDERA IGNORAR CONFIGURAÇÕES LOCAIS/DESENVOLVIMENTO
+# Se cada programador tiver uma 'connection string' diferente,
+# é boa prática não fazer commit do ficheiro de desenvolvimento.
+# O ficheiro 'appsettings.json' (sem sufixo) DEVE ir para o Git.
+# O 'appsettings.Development.json' é opcional.
+# appsettings.Development.json
