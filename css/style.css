@@ -1,0 +1,83 @@
+/* Custom tweaks shared by all pages */
+.hero-gradient {
+  background: radial-gradient(1200px 600px at -10% -10%,
+      rgba(13, 110, 253, 0.18),
+      transparent 60%),
+    radial-gradient(1200px 600px at 110% 0%,
+      rgba(13, 110, 253, 0.14),
+      transparent 60%),
+    linear-gradient(180deg, #111, #333);
+  color: #fff;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  display: none;
+  background: rgba(0, 0, 0, 0.85);
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  z-index: 1080;
+}
+
+.lightbox:target {
+  display: flex;
+}
+
+.lightbox img {
+  max-width: min(1000px, 90vw);
+  max-height: 80vh;
+  border-radius: 1rem;
+  box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.4);
+}
+
+.lightbox-close {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  color: #fff;
+  font-size: 2rem;
+  text-decoration: none;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  transition: transform 0.15s ease;
+}
+
+.social-icons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0d6efd, #6610f2);
+  color: #fff;
+  font-size: 24px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.social-icons a:hover {
+  transform: translateY(-4px) scale(1.1);
+  box-shadow: 0 8px 20px rgba(13, 110, 253, 0.4);
+}
+
+.social-icons a.instagram {
+  background: #E1306C;
+}
+
+.social-icons a.facebook {
+  background: #1877F2;
+}
+
+.social-icons a.linkedin {
+  background: #0A66C2;
+}
