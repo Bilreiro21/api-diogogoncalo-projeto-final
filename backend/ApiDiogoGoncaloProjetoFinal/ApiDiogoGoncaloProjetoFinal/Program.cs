@@ -6,19 +6,47 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text; // Para o Encoding.UTF8
 using Microsoft.OpenApi.Models;
-
+using Polly; // Necessário para as políticas de resiliência (Retries) ---
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
 // Lê a connection string do appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var serverVersion = new MySqlServerVersion(ServerVersion.AutoDetect(connectionString));
 
 // Regista o DbContext (o nosso "tradutor") e diz-lhe para usar MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, serverVersion));
+
+// --- CONFIGURAÇÃO DO REDIS CACHE (Recuperado) ---
+// O teu ProductsController precisa disto, senão dá erro ao iniciar!
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    // Lê a string de conexão "Redis" do docker-compose ou appsettings
+    // Se não estiver configurada, assume localhost:6379
+    var redisConnection = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
+    options.Configuration = redisConnection;
+    options.InstanceName = "ProjetoFinal_";
+});
+
+// --- CONFIGURAÇÃO DO CLIENTE HTTP PARA O WIREMOCK (NOVO) ---
+// Criamos um cliente chamado "FornecedorClient" que sabe falar com o Fornecedor Falso
+builder.Services.AddHttpClient("FornecedorClient", client =>
+{
+    // IMPORTANTE: Aqui usamos o NOME DO SERVIÇO no Docker (wiremock-fornecedor).
+    // O Docker resolve este nome para o IP correto do contentor.
+    client.BaseAddress = new Uri("http://localhost:9090/");
+})
+// Adiciona uma política de resiliência (Polly):
+// Se o pedido falhar (ex: erro de rede ou 5xx), tenta de novo automaticamente.
+// Tenta 3 vezes, esperando 500ms entre cada tentativa.
+.AddTransientHttpErrorPolicy(policy =>
+    policy.WaitAndRetryAsync(3, _ => TimeSpan.FromMilliseconds(500)));
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -51,8 +79,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// ... (depois de builder.Services.AddDbContext)
-
 // Regista o IPasswordHasher para o AuthController o poder usar
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
@@ -60,10 +86,10 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 // 1. Diz à API que vamos usar Autenticação
 builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
 
 // 2. Ensina a API a validar o "Bearer" Token (o JWT)
     .AddJwtBearer(options =>

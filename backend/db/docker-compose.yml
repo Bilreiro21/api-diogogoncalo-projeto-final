@@ -31,18 +31,28 @@ services:
     networks:
       - internal-network
 
-  # --- CACHE (REDIS) - NOVO ---
+  # --- Cache (Redis) ---
   cache-redis:
     image: redis:latest
     container_name: redis-projeto-final
     restart: unless-stopped
     ports:
-      # Mapeia a porta 6379 do contentor para o seu PC
-      # Isto permite que a API .NET se ligue via localhost:6379 quando corre o F5
       - "6379:6379"
     volumes:
-      # Opcional: cria um volume para não perder o cache se reiniciar o contentor
       - redis_data:/data
+    networks:
+      - internal-network
+
+  # --- IMPOSTER (WireMock) - O Fornecedor Falso ---
+  wiremock:
+    image: wiremock/wiremock:latest
+    container_name: wiremock-fornecedor
+    ports:
+      # Mapeia a porta 9090 do seu PC para a 8080 do WireMock
+      - "9090:8080" 
+    volumes:
+      # Liga a pasta que criámos ao contentor, para ele ler o JSON
+      - ./wiremock:/home/wiremock
     networks:
       - internal-network
 
@@ -51,4 +61,4 @@ networks:
 
 volumes:
   db_data:
-  redis_data: # Novo volume registado
+  redis_data:

@@ -1,0 +1,22 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "method": "GET",
+        "urlPattern": "/inventory/.*"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "sku": "{{request.path.[1]}}",
+          "stockQuantity": 150,
+          "expectedShipping": "2-3 days",
+          "supplier": "Mock Supplier Ltd"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

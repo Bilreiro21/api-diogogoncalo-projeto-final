@@ -1,5 +1,6 @@
 ﻿using ApiDiogoGoncaloProjetoFinal.Data;
 using ApiDiogoGoncaloProjetoFinal.Models;
+using ApiDiogoGoncaloProjetoFinal.DTOs; // --- NOVO: Para usar o SupplierStockDto
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
@@ -14,20 +15,24 @@ namespace ApiDiogoGoncaloProjetoFinal.Controllers
     [Authorize]
     public class ProductsController : ControllerBase
     {
-        // --- 3. A Ligação à Base de Dados e Cache ---
+        // --- 3. A Ligação à Base de Dados, Cache e Serviços Externos ---
 
         // Vamos guardar uma referência ao nosso "tradutor" da BD (o DbContext)
         private readonly ApplicationDbContext _context;
 
-        // NOVO: Vamos guardar uma referência ao nosso Cache (Redis)
+        // Vamos guardar uma referência ao nosso Cache (Redis)
         private readonly IDistributedCache _cache;
 
+        // --- NOVO: A "Fábrica" que cria clientes HTTP para falar com outras APIs (WireMock) ---
+        private readonly IHttpClientFactory _httpClientFactory;
+
         // O "Construtor": Quando o .NET cria este controlador,
-        // ele "injeta" o DbContext E o Cache que registámos no Program.cs
-        public ProductsController(ApplicationDbContext context, IDistributedCache cache)
+        // ele "injeta" as dependências que registámos no Program.cs
+        public ProductsController(ApplicationDbContext context, IDistributedCache cache, IHttpClientFactory httpClientFactory)
         {
             _context = context;
             _cache = cache; // Guardamos o Redis pronto a usar
+            _httpClientFactory = httpClientFactory; // --- NOVO: Guardamos a fábrica pronta a usar
         }
 
         // --- 4. Os Endpoints (as "Ações") ---
@@ -81,7 +86,6 @@ namespace ApiDiogoGoncaloProjetoFinal.Controllers
         /// <summary>
         /// GET: /api/products/5
         /// Devolve UM produto específico pelo seu Id.
-        /// (Nota: Não vamos aplicar cache aqui para simplificar, mas podíamos)
         /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
@@ -97,6 +101,53 @@ namespace ApiDiogoGoncaloProjetoFinal.Controllers
 
             // Se encontrar, devolve o produto
             return Ok(product);
+        }
+
+        // --- NOVO ENDPOINT DE DROPSHIPPING (Integração com WireMock) ---
+        /// <summary>
+        /// GET: /api/products/1/stock
+        /// 1. Vai à BD buscar o SKU do produto.
+        /// 2. Vai ao Fornecedor (WireMock) perguntar o stock real.
+        /// </summary>
+        [HttpGet("{id}/stock")]
+        public async Task<IActionResult> GetProductStock(int id)
+        {
+            // 1. Ir à BD local apenas para saber qual é o SKU deste produto
+            var product = await _context.Products.FindAsync(id);
+            if (product == null) return NotFound("Produto não encontrado na BD local.");
+
+            // 2. Preparar o pedido ao Fornecedor
+            // Pedimos à fábrica para nos dar o cliente "FornecedorClient" que configurámos no Program.cs
+            // Este cliente já tem o endereço base do WireMock e a Resiliência (Polly) configurada.
+            var client = _httpClientFactory.CreateClient("FornecedorClient");
+
+            try
+            {
+                // 3. Fazer a chamada ao WireMock
+                // URL Final será: http://wiremock-fornecedor:8080/inventory/{SKU}
+                var response = await client.GetFromJsonAsync<SupplierStockDto>($"inventory/{product.Sku}");
+
+                if (response == null) return NotFound("O fornecedor não devolveu dados.");
+
+                // 4. Devolver uma resposta bonita ao cliente, combinando dados da BD e do Fornecedor
+                return Ok(new
+                {
+                    Produto = product.Name,
+                    Descricao = product.Name, // ou product.Description se tiveres
+                    Sku = product.Sku,
+                    PrecoLoja = product.Price,
+                    // Dados vindos do WireMock:
+                    StockNoFornecedor = response.StockQuantity,
+                    EnvioEstimado = response.ExpectedShipping,
+                    Fornecedor = response.SupplierName
+                });
+            }
+            catch (Exception ex)
+            {
+                // Se o WireMock estiver desligado, ou der erro 3 vezes seguidas (Polly desistiu),
+                // caímos aqui. Devolvemos 503 (Service Unavailable).
+                return StatusCode(503, $"Não foi possível contactar o fornecedor: {ex.Message}");
+            }
         }
 
         /// <summary>
