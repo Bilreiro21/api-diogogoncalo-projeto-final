@@ -1,6 +1,7 @@
 version: "3.8"
 
 services:
+  # --- Base de Dados (MySQL) ---
   db:
     platform: linux/x86_64
     image: mysql:8.1
@@ -15,6 +16,7 @@ services:
     networks:
       - internal-network
 
+  # --- Interface da Base de Dados (PhpMyAdmin) ---
   phpmyadmin:
     depends_on:
       - db
@@ -29,8 +31,24 @@ services:
     networks:
       - internal-network
 
+  # --- CACHE (REDIS) - NOVO ---
+  cache-redis:
+    image: redis:latest
+    container_name: redis-projeto-final
+    restart: unless-stopped
+    ports:
+      # Mapeia a porta 6379 do contentor para o seu PC
+      # Isto permite que a API .NET se ligue via localhost:6379 quando corre o F5
+      - "6379:6379"
+    volumes:
+      # Opcional: cria um volume para não perder o cache se reiniciar o contentor
+      - redis_data:/data
+    networks:
+      - internal-network
+
 networks:
   internal-network:
 
 volumes:
   db_data:
+  redis_data: # Novo volume registado
