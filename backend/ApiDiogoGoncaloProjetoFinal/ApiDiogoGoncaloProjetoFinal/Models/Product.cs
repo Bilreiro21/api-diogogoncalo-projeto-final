@@ -15,5 +15,8 @@ public partial class Product
 
     public decimal Price { get; set; }
 
+    // Mapeia a coluna 'ImageUrl' que criámos no MySQL
+    public string? ImageUrl { get; set; }
+
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 }
