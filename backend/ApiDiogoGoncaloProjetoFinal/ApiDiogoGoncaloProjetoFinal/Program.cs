@@ -114,6 +114,17 @@ builder.Services.AddAuthentication(options =>
 // Temos de adicionar isto também para o [Authorize] funcionar
 builder.Services.AddAuthorization();
 
+// Adicionar o Serviço de CORS (Permitir tudo para desenvolvimento)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()   // Permite qualquer site (o teu frontend)
+              .AllowAnyMethod()   // Permite GET, POST, PUT, DELETE
+              .AllowAnyHeader();  // Permite enviar o Token JWT
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -124,6 +135,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Ativar o CORS
+app.UseCors("AllowAll");
 
 app.UseAuthentication(); // Quem és tu?
 app.UseAuthorization();  // O que podes fazer?
