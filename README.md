@@ -71,7 +71,7 @@ Clonar o Repositório:
 Bash
 
 git clone https://github.com/Bilreiro21/api-diogogoncalo-projeto-final.git
-cd api-dariojoana-projeto-final
+cd api-diogogoncalo-projeto-final
 Arrancar os Serviços (Docker): Na raiz do projeto (onde está o docker-compose.yml), execute:
 
 Bash
