@@ -157,6 +157,16 @@ namespace ApiDiogoGoncaloProjetoFinal.Controllers
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(Product product)
         {
+
+            // Bloco de segurança Admin
+            // Vai buscar o email de quem está a fazer o pedido
+            var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            // Se o email não for o do Chefe, manda passear (403 Forbidden)
+            if (userEmail != "admin@teste.com")
+            {
+                return Forbid(); // Devolve erro 403: Acesso Proibido
+            }
+
             // adicionamos o produto que veio no "body" do pedido
             _context.Products.Add(product);
 
@@ -178,6 +188,15 @@ namespace ApiDiogoGoncaloProjetoFinal.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct(int id, Product product)
         {
+            // Bloco de segurança Admin
+            // Vai buscar o email de quem está a fazer o pedido
+            var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            // Se o email não for o do Chefe, manda passear (403 Forbidden)
+            if (userEmail != "admin@teste.com")
+            {
+                return Forbid(); // Devolve erro 403: Acesso Proibido
+            }
+
             // Verifica se o Id da URL é o mesmo do Id do produto no "body"
             if (id != product.Id)
             {
@@ -220,6 +239,15 @@ namespace ApiDiogoGoncaloProjetoFinal.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
+            // Bloco de segurança Admin
+            // Vai buscar o email de quem está a fazer o pedido
+            var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            // Se o email não for o do Chefe, manda passear (403 Forbidden)
+            if (userEmail != "admin@teste.com")
+            {
+                return Forbid(); // Devolve erro 403: Acesso Proibido
+            }
+
             // procuramos o produto na BD
             var product = await _context.Products.FindAsync(id);
             if (product == null)
