@@ -20,7 +20,6 @@ A grande diferenciação técnica reside na gestão de stock: a loja não possui
 
 O projeto foi desenvolvido utilizando uma arquitetura de microsserviços containerizados via **Docker Compose**.
 
-```mermaid
 🛠️ Stack Tecnológico
 
 Backend: ASP.NET Core Web API (.NET 8) 
