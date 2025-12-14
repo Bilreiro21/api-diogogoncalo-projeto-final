@@ -1,12 +1,12 @@
 using ApiDiogoGoncaloProjetoFinal.Data;
-using ApiDiogoGoncaloProjetoFinal.Models; // Onde está o seu modelo User
+using ApiDiogoGoncaloProjetoFinal.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity; // Para o PasswordHasher
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text; // Para o Encoding.UTF8
 using Microsoft.OpenApi.Models;
-using Polly; // Necessário para as políticas de resiliência (Retries) ---
+using Polly; // Necessário para as políticas de resiliência
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,11 +18,11 @@ builder.Services.AddControllers();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var serverVersion = new MySqlServerVersion(ServerVersion.AutoDetect(connectionString));
 
-// Regista o DbContext (o nosso "tradutor") e diz-lhe para usar MySQL
+// Regista o DbContext e diz-lhe para usar MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, serverVersion));
 
-// --- CONFIGURAÇÃO DO REDIS CACHE (Recuperado) ---
-// O teu ProductsController precisa disto, senão dá erro ao iniciar!
+// config do redis cache (Recuperado)
+// O ProductsController precisa disto, senão dá erro ao iniciar!
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     // Lê a string de conexão "Redis" do docker-compose ou appsettings
@@ -32,12 +32,12 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "ProjetoFinal_";
 });
 
-// --- CONFIGURAÇÃO DO CLIENTE HTTP PARA O WIREMOCK (NOVO) ---
+// CONFIGURAÇÃO DO CLIENTE HTTP PARA O WIREMOCK (NOVO)
 // Criamos um cliente chamado "FornecedorClient" que sabe falar com o Fornecedor Falso
 builder.Services.AddHttpClient("FornecedorClient", client =>
 {
-    // IMPORTANTE: Aqui usamos o NOME DO SERVIÇO no Docker (wiremock-fornecedor).
-    // O Docker resolve este nome para o IP correto do contentor.
+    // aqui usamos o NOME DO SERVIÇO no Docker (wiremock-fornecedor).
+    // o Docker resolve este nome para o IP correto do contentor.
     client.BaseAddress = new Uri("http://localhost:9090/");
 })
 // Adiciona uma política de resiliência (Polly):
@@ -51,7 +51,7 @@ builder.Services.AddHttpClient("FornecedorClient", client =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    // 1. Adiciona uma definição de segurança (o que é "Bearer")
+    // Adiciona uma definição de segurança (o que é "Bearer")
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -62,7 +62,7 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Introduza 'Bearer' [espaço] e o seu token. \n\nExemplo: 'Bearer eyJhbGciOiJIUzI1Ni...'"
     });
 
-    // 2. Diz ao Swagger para APLICAR esta definição a todos os endpoints
+    // Diz ao Swagger para APLICAR esta definição a todos os endpoints
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -82,16 +82,16 @@ builder.Services.AddSwaggerGen(options =>
 // Regista o IPasswordHasher para o AuthController o poder usar
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
-// --- Configuração do JWT ---
+// Configuração do JWT
 
-// 1. Diz à API que vamos usar Autenticação
+// diz à API que vamos usar Autenticação
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 
-// 2. Ensina a API a validar o "Bearer" Token (o JWT)
+// ensinar a API a validar o "Bearer" Token (o JWT)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -99,8 +99,8 @@ builder.Services.AddAuthentication(options =>
             // O que validar:
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true, // Rejeita tokens expirados
-            ValidateIssuerSigningKey = true, // A parte mais importante
+            ValidateLifetime = true, // rejeita tokens expirados
+            ValidateIssuerSigningKey = true,
 
             // Quais os valores válidos (lidos do appsettings.json):
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
@@ -111,23 +111,23 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-// Temos de adicionar isto também para o [Authorize] funcionar
+// adicionamos isto também para o [Authorize] funcionar
 builder.Services.AddAuthorization();
 
-// Adicionar o Serviço de CORS (Permitir tudo para desenvolvimento)
+// adicionar o Serviço de CORS (Permitir tudo para desenvolvimento)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()   // Permite qualquer site (o teu frontend)
-              .AllowAnyMethod()   // Permite GET, POST, PUT, DELETE
-              .AllowAnyHeader();  // Permite enviar o Token JWT
+        policy.AllowAnyOrigin()   // permite qualquer site 
+              .AllowAnyMethod()   // permite GET, POST, PUT, DELETE
+              .AllowAnyHeader();  // permite enviar o Token JWT
     });
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -139,8 +139,8 @@ app.UseHttpsRedirection();
 // Ativar o CORS
 app.UseCors("AllowAll");
 
-app.UseAuthentication(); // Quem és tu?
-app.UseAuthorization();  // O que podes fazer?
+app.UseAuthentication(); // quem és tu?
+app.UseAuthorization();  // o que podes fazer?
 
 app.MapControllers();
 
