@@ -70,7 +70,7 @@ namespace ApiDiogoGoncaloProjetoFinal.Controllers
             // 1. Encontrar o utilizador pelo email
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
-            // 2. Verificar se o utilizador existe E se a password está correta
+            // 2. Verificar se o utilizador existe e se a password está correta
             if (user == null || _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginDto.Password) == PasswordVerificationResult.Failed)
             {
                 // Damos uma resposta vaga de propósito (por segurança)
