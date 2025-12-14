@@ -7,7 +7,9 @@ public partial class Product
 {
     public int Id { get; set; }
 
-    public string Sku { get; set; } = null!;
+    public string Sku { get; set; } = null!; // Stock Keeping Unit
+                                             // Basicamente,é um código único que criamos para identificar cada variante
+                                             // de um produto no inventário.
 
     public string Name { get; set; } = null!;
 
