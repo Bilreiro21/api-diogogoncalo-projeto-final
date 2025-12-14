@@ -35,12 +35,12 @@ function updateNavAuth() {
   li.className = "nav-item ms-lg-2";
 
   if (isLoggedIn()) {
-    li.innerHTML = `<button class="btn btn-outline-danger btn-sm mt-2 mt-lg-0" onclick="logout()">Logout</button>`;
+    li.innerHTML = `<button class="btn btn-outline-danger btn-sm mt-2 mt-lg-0" onclick="logout()">Sair</button>`;
   } else {
     // Não mostra botão na pagina de login/registo
     if(!window.location.href.includes("login.html") && !window.location.href.includes("register.html")) {
         // Link direto, pois estão na mesma pasta
-        li.innerHTML = `<a class="btn btn-outline-primary btn-sm mt-2 mt-lg-0" href="login.html">Login</a>`;
+        li.innerHTML = `<a class="btn btn-outline-primary btn-sm mt-2 mt-lg-0" href="login.html">Entrar</a>`;
     }
   }
   navList.appendChild(li);
@@ -77,7 +77,7 @@ document.addEventListener("click", (e) => {
         const originalText = btn.textContent;
         btn.classList.remove("btn-primary");
         btn.classList.add("btn-success");
-        btn.textContent = "Added!";
+        btn.textContent = "Adicionado!";
         setTimeout(() => {
             btn.classList.remove("btn-success");
             btn.classList.add("btn-primary");
