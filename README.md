@@ -1,7 +1,9 @@
 # 📦 DropShipX - Plataforma de E-Commerce & Dropshipping
 
 > **Projeto Final:** Criação de API consumida por Website.
+
 > **UC:** UC00605 - Programar para a web, na vertente servidor (server-side).
+
 > **Autores:** Diogo Bilreiro & Gonçalo Gonçalves
 
 ![Status](https://img.shields.io/badge/Status-Concluído-success)
