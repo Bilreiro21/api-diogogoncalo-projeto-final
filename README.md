@@ -48,6 +48,7 @@ Frontend: HTML5, CSS3, Bootstrap 5, JavaScript (Fetch API)
 DevOps: Docker & Docker Compose 
 
 ✨ Funcionalidades Principais
+
 Autenticação Segura: Registo e Login de utilizadores com emissão de Tokens JWT.
 
 Catálogo Otimizado: Listagem de produtos com imagens dinâmicas e Cache Redis para alta performance (reduzindo a carga na BD).
@@ -95,6 +96,7 @@ Swagger (Documentação da API): http://localhost:7079/swagger
 WireMock (Dashboard): http://localhost:9090/__admin
 
 🧪 Como Testar (Guião Rápido)
+
 Registo: Vá a Login > Sign up e crie uma conta.
 
 Catálogo: Navegue para Products. Carregamento é rápido (Redis).
