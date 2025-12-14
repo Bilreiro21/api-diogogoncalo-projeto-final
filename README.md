@@ -103,21 +103,32 @@ Compra: Adicione produtos ao Cart, vá a Checkout e finalize a compra.
 
 Confirmação: Vá a My Orders para ver a encomenda registada na base de dados.
 
-📂 Estrutura do Repositório
-/
-├── ApiDiogoGoncaloProjetoFinal/   # Código Fonte .NET 8
-│   ├── Controllers/
-│   ├── Models/
-│   ├── Data/
-│   └── Program.cs
+## 📂 Estrutura do Repositório
+
+O projeto está organizado da seguinte forma:
+
+```text
+ApiDiogoGoncaloProjetoFinal/       # Raiz do Projeto
+│
+├── Controllers/                   # Endpoints da API (Products, Auth, Orders)
+├── Models/                        # Entidades da Base de Dados (Product, User...)
+├── Data/                          # Configuração do Entity Framework (DbContext)
+├── DTOs/                          # Objetos de Transferência de Dados
+├── Program.cs                     # Configuração Principal (.NET 8, DI, Swagger)
+│
 ├── frontend/                      # Aplicação Web (Cliente)
-│   ├── css/
-│   ├── js/
-│   ├── Pages/ (index, products, login...)
-│   └── assets/
-├── database/                      # Scripts SQL
+│   ├── css/                       # Folhas de estilo
+│   ├── js/                        # Lógica Javascript (Fetch API)
+│   ├── Pages/                     # Páginas HTML (Login, Catálogo, Checkout...)
+│   └── assets/                    # Imagens dos produtos
+│
+├── database/                      # Scripts de Base de Dados
+│   └── seed.sql                   # Script para popular produtos e imagens
+│
 ├── imposter/                      # Configuração do WireMock
-├── docker-compose.yml             # Orquestração de Contentores
-└── README.md                      # Documentação
+│   └── mappings/                  # Regras de resposta do fornecedor falso
+│
+├── docker-compose.yml             # Orquestração dos contentores (API, DB, Redis, WireMock)
+└── README.md                      # Documentação do Projeto
 
 Projeto desenvolvido no âmbito da UC00605, 2025.
