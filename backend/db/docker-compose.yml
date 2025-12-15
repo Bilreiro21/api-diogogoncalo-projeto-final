@@ -16,21 +16,6 @@ services:
     networks:
       - internal-network
 
-  # --- Interface da Base de Dados (PhpMyAdmin) ---
-  phpmyadmin:
-    depends_on:
-      - db
-    image: phpmyadmin:5.2
-    container_name: phpmyadmin5_2_tpsi0525
-    restart: unless-stopped
-    ports:
-      - "8090:80"
-    environment:
-      PMA_HOST: db
-      MYSQL_ROOT_PASSWORD: 123456789
-    networks:
-      - internal-network
-
   # --- Cache (Redis) ---
   cache-redis:
     image: redis:latest
